@@ -29,8 +29,11 @@ def find_context_parameter(fn: Callable[..., Any]) -> str | None:
         # If we can't resolve type hints, we can't find the context parameter
         return None
 
-    # Check each parameter's type hint
+    # Check each parameter's type hint (get_type_hints includes the
+    # return annotation under the key "return", which is not a parameter)
     for param_name, annotation in hints.items():
+        if param_name == "return":
+            continue
         # Handle direct Context type
         if inspect.isclass(annotation) and issubclass(annotation, Context):
             return param_name
