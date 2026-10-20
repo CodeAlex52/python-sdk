@@ -1544,6 +1544,9 @@ def test_bare_dict_structured_output_roundtrips() -> None:
 
     metadata = func_metadata(func, structured_output=True)
     assert metadata.output_model is not None
-    validated = metadata.output_model.model_validate(func())
-    assert validated.model_dump()["result"] == {"a": 1}
+    assert metadata.wrap_output is True
+
+    # wrap_output means the payload the server sends is {"result": <return value>}.
+    validated = metadata.output_model.model_validate({"result": func()})
+    assert validated.model_dump() == {"result": {"a": 1}}
 
